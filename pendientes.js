@@ -615,6 +615,66 @@ window.PENDIENTES = {
       "te": "30 min",
       "snii": 10,
       "notas": "Antes de 12:00 PM CDMX del 30 abril. 14h de margen. Confirmar email de Submittable."
+    },
+    {
+      "id": 80,
+      "titulo": "Diseñar instrumento encuesta pre/post — Curso IA docentes",
+      "cat": "IA-Docentes",
+      "p": "alta",
+      "fl": "2026-05-31",
+      "te": "4 h",
+      "snii": 8,
+      "notas": "Encuesta pre y post para medir cambio en adopción de IA para diseño instruccional. Debe estar lista antes de junio para aplicar en Fase 1 (CU Tlaquepaque). Diseño cuasi-experimental. Vinculado a Innovaforum resumen #2."
+    },
+    {
+      "id": 81,
+      "titulo": "Diseñar materiales del curso en Moodle (generador de preguntas, simulaciones HTML)",
+      "cat": "IA-Docentes",
+      "p": "alta",
+      "fl": "2026-05-31",
+      "te": "8 h",
+      "snii": 8,
+      "notas": "Contenidos: generador de preguntas con IA, creación de simulaciones HTML, incrustación en Moodle. El curso debe estar listo antes de junio. Se replicará en ambas fases sin cambios mayores."
+    },
+    {
+      "id": 82,
+      "titulo": "Fase 1 — Impartir curso IA en CU Tlaquepaque (~20 profesores)",
+      "cat": "IA-Docentes",
+      "p": "alta",
+      "fl": "2026-06-30",
+      "te": "curso completo",
+      "snii": 9,
+      "notas": "Ventana: intersemestral UDG, junio 2026. ~20 profesores. Aplicar encuesta pre al inicio y post al cierre. Una sola oportunidad al año en UDG."
+    },
+    {
+      "id": 83,
+      "titulo": "Fase 2 — Impartir curso IA en UTJ (30–40 profesores)",
+      "cat": "IA-Docentes",
+      "p": "media",
+      "fl": "2026-12-15",
+      "te": "curso completo",
+      "snii": 9,
+      "notas": "Ventana: cierre de cuatrimestre UTJ, diciembre 2026. 30–40 profesores. Aplicar mismas encuestas pre/post. Permite comparar tecnológica vs. centro universitario."
+    },
+    {
+      "id": 84,
+      "titulo": "Analizar datos encuestas pre/post (ambas fases) y redactar artículo",
+      "cat": "IA-Docentes",
+      "p": "baja",
+      "fl": "2027-01-31",
+      "te": "20 h",
+      "snii": 9,
+      "notas": "n total estimado: 50–60 docentes en dos contextos institucionales. Comparación UTJ vs. CU Tlaquepaque. Envío a revista Q2 en enero-febrero 2027. Publicación estimada: finales 2027. Marco: adopción de IA generativa en formación docente (no centrado en herramienta específica)."
+    },
+    {
+      "id": 85,
+      "titulo": "Redactar resumen Innovaforum 2026 — IA para formación docente (Fase 1)",
+      "cat": "IA-Docentes",
+      "p": "alta",
+      "fl": "2026-06-08",
+      "te": "3 h",
+      "snii": 8,
+      "notas": "Basado en resultados preliminares de Fase 1 (CU Tlaquepaque). Eje: tecnología educativa / IA. Sustituye o complementa resumen #2 de Innovaforum. Máx. 1000 palabras. Límite: 8 junio 2026."
     }
   ]
 };
