@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panel — Dr. Víctor Chávez Pérez</title>
-<!-- Carga los datos desde pendientes.js (mismo directorio) -->
 <script src="pendientes.js"></script>
 <style>
 :root { color-scheme: light; }
@@ -43,15 +42,17 @@ body { background: #f5f2ec; color: #1c1a17; font-family: system-ui, -apple-syste
 .tarea.media   { border-left-color: #a07808; }
 .tarea.baja    { border-left-color: #2a7030; }
 .tarea.vencida { background: #fdf1f0; }
+.tarea.completada { border-left-color: #2a7030; opacity: .75; }
 
 .tarea-head { display: flex; align-items: flex-start; gap: 10px; padding: .6rem .9rem; cursor: pointer; user-select: none; }
 .tarea-head:hover { background: #faf8f5; }
 .check { width: 16px; height: 16px; border: 1.5px solid #c0bbb4; border-radius: 3px; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; margin-top: 1px; }
+.check:hover { border-color: #2a7030; background: #f0f8f0; }
 .check.checked { background: #2a7030; border-color: #2a7030; }
 .check.checked::after { content: ''; width: 4px; height: 8px; border: 1.5px solid #fff; border-top: none; border-left: none; transform: rotate(45deg) translateY(-1px); display: block; }
 .tarea-body { flex: 1; min-width: 0; }
 .tarea-titulo { font-size: 13.5px; font-weight: 500; line-height: 1.35; }
-.tarea-titulo.tachada { text-decoration: line-through; opacity: .4; }
+.tarea-titulo.tachada { text-decoration: line-through; opacity: .5; }
 .chips { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
 .chip { font-family: monospace; font-size: 10px; padding: 1px 6px; border-radius: 3px; border: 1px solid #e0dbd2; color: #777; white-space: nowrap; }
 .chip.red    { background: #fdf1f0; color: #b83228; border-color: #e8aba6; }
@@ -77,9 +78,34 @@ body { background: #f5f2ec; color: #1c1a17; font-family: system-ui, -apple-syste
 .ctx td { padding: 2px 0; vertical-align: top; }
 .ctx td:first-child { color: #bbb; font-family: monospace; font-size: 10px; width: 90px; text-transform: uppercase; padding-right: 10px; white-space: nowrap; }
 
+/* Botón restaurar en tareas completadas */
+.restore-btn { background: none; border: 1px solid #c0d8c0; border-radius: 4px; color: #2a7030; font-size: 10px; font-family: monospace; padding: 2px 8px; cursor: pointer; flex-shrink: 0; white-space: nowrap; }
+.restore-btn:hover { background: #f0f8f0; }
+
+/* Sección completadas */
+.completadas-header { display: flex; align-items: center; justify-content: space-between; margin: 2rem 0 .5rem; }
+.completadas-toggle { font-family: monospace; font-size: 11px; padding: 4px 12px; border-radius: 4px; border: 1px solid #c0d8c0; background: #f0f8f0; color: #2a7030; cursor: pointer; }
+.completadas-toggle:hover { background: #e0f0e0; }
+.reset-btn { font-family: monospace; font-size: 10px; padding: 3px 10px; border-radius: 4px; border: 1px solid #e8aba6; background: #fdf1f0; color: #b83228; cursor: pointer; }
+.reset-btn:hover { background: #fce0de; }
+
 .empty-msg { color: #c0bbb4; padding: 2rem; text-align: center; font-family: monospace; font-size: 12px; }
 .err { background: #fdf8e8; border: 1px solid #d8c070; border-radius: 7px; padding: 1rem 1.2rem; margin: 1rem 0; font-size: 13px; color: #7a5800; }
 .err code { background: #f0ead8; padding: 1px 5px; border-radius: 3px; font-family: monospace; }
+
+/* Modal de confirmación */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 1000; align-items: center; justify-content: center; }
+.modal-overlay.visible { display: flex; }
+.modal { background: #fff; border-radius: 10px; padding: 1.5rem 1.75rem; max-width: 420px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,.18); }
+.modal h3 { font-size: 15px; font-weight: 600; margin-bottom: .5rem; }
+.modal p { font-size: 13px; color: #555; margin-bottom: 1.25rem; line-height: 1.5; }
+.modal p strong { color: #1c1a17; }
+.modal-btns { display: flex; gap: .6rem; justify-content: flex-end; }
+.modal-btns button { font-size: 13px; padding: .45rem 1.1rem; border-radius: 6px; border: 1px solid #ddd; cursor: pointer; font-family: inherit; }
+.btn-cancelar { background: #fff; color: #555; }
+.btn-cancelar:hover { background: #f5f2ec; }
+.btn-confirmar { background: #2a7030; color: #fff; border-color: #2a7030; font-weight: 600; }
+.btn-confirmar:hover { background: #1e5424; }
 </style>
 </head>
 <body>
@@ -115,19 +141,47 @@ body { background: #f5f2ec; color: #1c1a17; font-family: system-ui, -apple-syste
   <div class="filters" id="filtros"></div>
   <div id="panel"></div>
 
+  <!-- Sección completadas -->
+  <div id="completadas-section" style="display:none">
+    <div class="completadas-header">
+      <div class="sec-label" style="flex:1;margin:0">✅ Completadas <span class="chip green" id="done-count">0</span></div>
+      <div style="display:flex;gap:.5rem;margin-left:1rem">
+        <button class="completadas-toggle" onclick="toggleCompletadas()">Mostrar / Ocultar</button>
+        <button class="reset-btn" onclick="resetTodas()">↺ Restaurar todas</button>
+      </div>
+    </div>
+    <div id="lista-completadas" style="display:none"></div>
+  </div>
+
 </div>
+
+<!-- Modal de confirmación -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3>¿Marcar como completada?</h3>
+    <p id="modal-titulo"></p>
+    <div class="modal-btns">
+      <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-confirmar" onclick="confirmarDone()">✓ Completada</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const CAT_COLOR = {
   'Google.org':'red','IAG-UTJ':'orange','UTJ':'gold',
-  'CU Tlaquepaque':'blue','Investigación':'blue',
-  'Tlakakini':'purple','Personal':'dark'
+  'CU Tlaquepaque':'blue','Investigación':'blue','Investigacion':'blue',
+  'Tlakakini':'purple','Personal':'dark','IA-Docentes':'purple'
 };
 const P_LABEL = { critica:'🔴 Críticas', alta:'🟠 Alta prioridad', media:'🟡 Media prioridad', baja:'🟢 Baja / en espera' };
 const P_COL   = { critica:'red', alta:'orange', media:'gold', baja:'green' };
 
 let TAREAS = [], META = {}, filtro = 'todos';
-const LS_KEY = 'panel_victor_done';
+const LS_KEY = 'panel_victor_done_v2';
 const done = new Set(JSON.parse(localStorage.getItem(LS_KEY) || '[]'));
+
+// pendiente de confirmar en modal
+let pendingId = null;
 
 function saveDone() { localStorage.setItem(LS_KEY, JSON.stringify([...done])); }
 
@@ -168,7 +222,7 @@ function render() {
       html += `
         <div class="tarea ${p}${vencida?' vencida':''}">
           <div class="tarea-head" onclick="toggleCtx(${t.id})">
-            <div class="check" onclick="toggleDone(event,${t.id})"></div>
+            <div class="check" title="Marcar como completada" onclick="pedirConfirmacion(event,${t.id})"></div>
             <div class="tarea-body">
               <div class="tarea-titulo">${t.titulo}</div>
               <div class="chips">
@@ -195,7 +249,36 @@ function render() {
   }
   if (!html) html = '<div class="empty-msg">Sin pendientes en esta categoría.</div>';
   document.getElementById('panel').innerHTML = html;
+  renderCompletadas();
   updateStats();
+}
+
+function renderCompletadas() {
+  const lista = TAREAS.filter(t => done.has(t.id));
+  const sec = document.getElementById('completadas-section');
+  const cnt = document.getElementById('done-count');
+  cnt.textContent = lista.length;
+  if (lista.length === 0) { sec.style.display = 'none'; return; }
+  sec.style.display = '';
+  let html = '';
+  for (const t of lista) {
+    const cc = CAT_COLOR[t.cat] || 'blue';
+    html += `
+      <div class="tarea completada">
+        <div class="tarea-head">
+          <div class="check checked" style="cursor:default"></div>
+          <div class="tarea-body">
+            <div class="tarea-titulo tachada">${t.titulo}</div>
+            <div class="chips">
+              <span class="chip ${cc}">${t.cat}</span>
+              <span class="chip muted">${t.te}</span>
+            </div>
+          </div>
+          <button class="restore-btn" onclick="restaurar(${t.id})">↩ Restaurar</button>
+        </div>
+      </div>`;
+  }
+  document.getElementById('lista-completadas').innerHTML = html;
 }
 
 function updateStats() {
@@ -223,11 +306,53 @@ function setFiltro(f, btn) {
   render();
 }
 
-function toggleDone(e, id) {
+// Modal de confirmación
+function pedirConfirmacion(e, id) {
   e.stopPropagation();
-  done.has(id) ? done.delete(id) : done.add(id);
+  if (done.has(id)) { restaurar(id); return; }
+  const t = TAREAS.find(x => x.id === id);
+  if (!t) return;
+  pendingId = id;
+  document.getElementById('modal-titulo').innerHTML =
+    `¿Confirmas que terminaste: <strong>"${t.titulo}"</strong>?`;
+  document.getElementById('modal').classList.add('visible');
+}
+
+function cerrarModal() {
+  pendingId = null;
+  document.getElementById('modal').classList.remove('visible');
+}
+
+function confirmarDone() {
+  if (pendingId === null) return;
+  done.add(pendingId);
+  saveDone();
+  cerrarModal();
+  render();
+}
+
+// Cerrar modal con Escape o click fuera
+document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModal(); });
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) cerrarModal();
+});
+
+function restaurar(id) {
+  done.delete(id);
   saveDone();
   render();
+}
+
+function resetTodas() {
+  if (!confirm('¿Restaurar TODAS las tareas completadas a pendientes?')) return;
+  done.clear();
+  saveDone();
+  render();
+}
+
+function toggleCompletadas() {
+  const lista = document.getElementById('lista-completadas');
+  lista.style.display = lista.style.display === 'none' ? 'block' : 'none';
 }
 
 function toggleCtx(id) {
@@ -266,7 +391,7 @@ function init() {
     document.getElementById('panel').innerHTML = `
       <div class="err">
         No se encontró <code>pendientes.js</code>.<br>
-        Asegúrate de que <code>pendientes.js</code> está en la misma carpeta que <code>panel.html</code>.
+        Asegúrate de que <code>pendientes.js</code> está en la misma carpeta que <code>index.html</code>.
       </div>`;
     return;
   }
