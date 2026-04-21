@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel — Dr. Víctor Chávez Pérez</title>
+<!-- Carga los datos desde pendientes.js (mismo directorio) -->
+<script src="pendientes.js"></script>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #f5f2ec; color: #1c1a17; font-family: system-ui, -apple-system, sans-serif; font-size: 14px; line-height: 1.5; }
+.wrap { max-width: 920px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+
+.doc-header { border-bottom: 2px solid #1c1a17; padding-bottom: .85rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: .5rem; }
+.doc-header h1 { font-size: 19px; font-weight: 700; letter-spacing: -.02em; }
+.doc-header .sub { font-size: 11px; color: #888; margin-top: 3px; font-family: monospace; }
+.doc-header .meta { font-family: monospace; font-size: 11px; color: #aaa; text-align: right; }
+
+.banner { border-radius: 7px; padding: .65rem 1rem; margin-bottom: .6rem; font-size: 12.5px; }
+.banner.red  { background: #fdf1f0; border: 1px solid #e8aba6; border-left: 4px solid #b83228; color: #7a1c18; }
+.banner.blue { background: #eef4fc; border: 1px solid #90b8e8; border-left: 4px solid #1458a8; color: #1a3a60; }
+.banner strong { font-weight: 600; }
+
+.stats-bar { display: flex; gap: 12px; flex-wrap: wrap; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: .65rem 1.1rem; margin-bottom: 1rem; align-items: center; }
+.stat { text-align: center; min-width: 46px; }
+.stat-n { font-size: 22px; font-weight: 700; line-height: 1; }
+.stat-l { font-family: monospace; font-size: 9px; color: #aaa; text-transform: uppercase; letter-spacing: .06em; margin-top: 1px; }
+.stat-sep { width: 1px; background: #ebebeb; align-self: stretch; min-height: 34px; }
+
+.filters { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 1rem; }
+.filter-btn { font-size: 11px; font-family: monospace; padding: 4px 11px; border-radius: 4px; border: 1px solid #ddd; background: #fff; cursor: pointer; color: #555; transition: all .15s; }
+.filter-btn:hover { border-color: #aaa; }
+.filter-btn.active { background: #1c1a17; color: #fff; border-color: #1c1a17; }
+
+.sec-label { font-family: monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #aaa; display: flex; align-items: center; gap: .6rem; margin: 1.2rem 0 .5rem; }
+.sec-label::after { content: ''; flex: 1; height: 1px; background: #e8e4de; }
+
+.tarea { background: #fff; border: 1px solid #e4dfd7; border-left: 3px solid #ccc; border-radius: 7px; margin-bottom: 5px; overflow: hidden; transition: box-shadow .15s; }
+.tarea:hover { box-shadow: 0 1px 6px rgba(0,0,0,.07); }
+.tarea.critica { border-left-color: #b83228; }
+.tarea.alta    { border-left-color: #c45e18; }
+.tarea.media   { border-left-color: #a07808; }
+.tarea.baja    { border-left-color: #2a7030; }
+.tarea.vencida { background: #fdf1f0; }
+
+.tarea-head { display: flex; align-items: flex-start; gap: 10px; padding: .6rem .9rem; cursor: pointer; user-select: none; }
+.tarea-head:hover { background: #faf8f5; }
+.check { width: 16px; height: 16px; border: 1.5px solid #c0bbb4; border-radius: 3px; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; margin-top: 1px; }
+.check.checked { background: #2a7030; border-color: #2a7030; }
+.check.checked::after { content: ''; width: 4px; height: 8px; border: 1.5px solid #fff; border-top: none; border-left: none; transform: rotate(45deg) translateY(-1px); display: block; }
+.tarea-body { flex: 1; min-width: 0; }
+.tarea-titulo { font-size: 13.5px; font-weight: 500; line-height: 1.35; }
+.tarea-titulo.tachada { text-decoration: line-through; opacity: .4; }
+.chips { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
+.chip { font-family: monospace; font-size: 10px; padding: 1px 6px; border-radius: 3px; border: 1px solid #e0dbd2; color: #777; white-space: nowrap; }
+.chip.red    { background: #fdf1f0; color: #b83228; border-color: #e8aba6; }
+.chip.orange { background: #fdf4ee; color: #c45e18; border-color: #e8c090; }
+.chip.gold   { background: #fdf8e8; color: #9a7008; border-color: #d8c070; }
+.chip.green  { background: #f0f8f0; color: #2a7030; border-color: #98c898; }
+.chip.blue   { background: #eef4fc; color: #1458a8; border-color: #90b8e8; }
+.chip.purple { background: #f5eeff; color: #6b3cad; border-color: #c8a8e8; }
+.chip.dark   { background: #2c2a28; color: #e8e4de; border-color: #2c2a28; }
+.chip.muted  { color: #c0bbb4; border-color: #eee; font-size: 9px; }
+
+.pbadge { font-family: monospace; font-size: 9px; text-transform: uppercase; padding: 1px 5px; border-radius: 3px; }
+.pbadge.critica { background: #fdf1f0; color: #b83228; }
+.pbadge.alta    { background: #fdf4ee; color: #c45e18; }
+.pbadge.media   { background: #fdf8e8; color: #9a7008; }
+.pbadge.baja    { background: #f0f8f0; color: #2a7030; }
+
+.toggle-btn { background: none; border: none; cursor: pointer; font-size: 10px; color: #ccc; padding: 2px 6px; flex-shrink: 0; }
+.toggle-btn:hover { color: #888; }
+
+.ctx { display: none; border-top: 1px solid #f0ede8; padding: .55rem .9rem .65rem 2.2rem; background: #fbf9f6; font-size: 12px; color: #666; }
+.ctx table { width: 100%; border-collapse: collapse; }
+.ctx td { padding: 2px 0; vertical-align: top; }
+.ctx td:first-child { color: #bbb; font-family: monospace; font-size: 10px; width: 90px; text-transform: uppercase; padding-right: 10px; white-space: nowrap; }
+
+.empty-msg { color: #c0bbb4; padding: 2rem; text-align: center; font-family: monospace; font-size: 12px; }
+.err { background: #fdf8e8; border: 1px solid #d8c070; border-radius: 7px; padding: 1rem 1.2rem; margin: 1rem 0; font-size: 13px; color: #7a5800; }
+.err code { background: #f0ead8; padding: 1px 5px; border-radius: 3px; font-family: monospace; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="doc-header">
+    <div>
+      <h1>Dr. Víctor Manuel Chávez Pérez</h1>
+      <div class="sub">UTJ · CU Tlaquepaque · CUCEI-UDG — Panel de gestión 2026</div>
+    </div>
+    <div class="meta" id="meta-txt"></div>
+  </div>
+
+  <div id="banner-google" class="banner red" style="display:none">
+    <strong>⚑ Google.org Impact Challenge</strong> — <span id="google-txt"></span>
+  </div>
+  <div id="banner-cte" class="banner blue" style="display:none"></div>
+
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-n" style="color:#b83228" id="sc">—</div><div class="stat-l">Críticas</div></div>
+    <div class="stat-sep"></div>
+    <div class="stat"><div class="stat-n" style="color:#c45e18" id="sa">—</div><div class="stat-l">Alta</div></div>
+    <div class="stat-sep"></div>
+    <div class="stat"><div class="stat-n" style="color:#9a7008" id="sm">—</div><div class="stat-l">Media</div></div>
+    <div class="stat-sep"></div>
+    <div class="stat"><div class="stat-n" style="color:#2a7030" id="sb">—</div><div class="stat-l">Baja</div></div>
+    <div class="stat-sep"></div>
+    <div class="stat"><div class="stat-n" id="st">—</div><div class="stat-l">Total</div></div>
+    <div class="stat-sep"></div>
+    <div class="stat"><div class="stat-n" style="color:#2a7030" id="sh">0</div><div class="stat-l">Hechas</div></div>
+  </div>
+
+  <div class="filters" id="filtros"></div>
+  <div id="panel"></div>
+
+</div>
+<script>
+const CAT_COLOR = {
+  'Google.org':'red','IAG-UTJ':'orange','UTJ':'gold',
+  'CU Tlaquepaque':'blue','Investigación':'blue',
+  'Tlakakini':'purple','Personal':'dark'
+};
+const P_LABEL = { critica:'🔴 Críticas', alta:'🟠 Alta prioridad', media:'🟡 Media prioridad', baja:'🟢 Baja / en espera' };
+const P_COL   = { critica:'red', alta:'orange', media:'gold', baja:'green' };
+
+let TAREAS = [], META = {}, filtro = 'todos';
+const LS_KEY = 'panel_victor_done';
+const done = new Set(JSON.parse(localStorage.getItem(LS_KEY) || '[]'));
+
+function saveDone() { localStorage.setItem(LS_KEY, JSON.stringify([...done])); }
+
+function dr(f) {
+  if (!f) return null;
+  const h = new Date(); h.setHours(0,0,0,0);
+  return Math.ceil((new Date(f) - h) / 86400000);
+}
+function fmt(f) {
+  if (!f) return '—';
+  const [y,m,d] = f.split('-'); return `${d}/${m}/${y.slice(2)}`;
+}
+function fechaChip(t) {
+  const d = dr(t.fl);
+  if (d === null) return '';
+  if (d < 0)  return `<span class="chip red">VENCIDA ${Math.abs(d)}d</span>`;
+  if (d === 0) return `<span class="chip red">HOY</span>`;
+  if (d === 1) return `<span class="chip orange">MAÑANA</span>`;
+  if (d <= 3)  return `<span class="chip orange">${d}d</span>`;
+  if (d <= 7)  return `<span class="chip gold">${d}d</span>`;
+  return `<span class="chip">${fmt(t.fl)}</span>`;
+}
+
+function render() {
+  const grupos = { critica:[], alta:[], media:[], baja:[] };
+  TAREAS.forEach(t => {
+    if (filtro !== 'todos' && t.cat !== filtro) return;
+    if (done.has(t.id)) return;
+    grupos[t.p].push(t);
+  });
+  let html = '';
+  for (const [p, lista] of Object.entries(grupos)) {
+    if (!lista.length) continue;
+    html += `<div class="sec-label">${P_LABEL[p]} <span class="chip ${P_COL[p]}">${lista.length}</span></div>`;
+    for (const t of lista) {
+      const vencida = dr(t.fl) !== null && dr(t.fl) < 0;
+      const cc = CAT_COLOR[t.cat] || 'blue';
+      html += `
+        <div class="tarea ${p}${vencida?' vencida':''}">
+          <div class="tarea-head" onclick="toggleCtx(${t.id})">
+            <div class="check" onclick="toggleDone(event,${t.id})"></div>
+            <div class="tarea-body">
+              <div class="tarea-titulo">${t.titulo}</div>
+              <div class="chips">
+                <span class="chip ${cc}">${t.cat}</span>
+                ${fechaChip(t)}
+                <span class="pbadge ${p}">${p}</span>
+                ${t.snii >= 7 ? `<span class="chip green">SNII ×${t.snii}</span>`
+                  : t.snii >= 4 ? `<span class="chip">SNII ×${t.snii}</span>` : ''}
+                <span class="chip muted">${t.te}</span>
+              </div>
+            </div>
+            <button class="toggle-btn" id="btn${t.id}" onclick="toggleCtx(${t.id});event.stopPropagation()">▶</button>
+          </div>
+          <div class="ctx" id="ctx${t.id}">
+            <table>
+              <tr><td>Fecha</td><td>${t.fl ? fmt(t.fl)+(dr(t.fl)!==null?' ('+dr(t.fl)+'d)':'') : 'sin fecha límite'}</td></tr>
+              <tr><td>Tiempo</td><td>${t.te}</td></tr>
+              ${t.snii > 0 ? `<tr><td>SNII</td><td>${t.snii}/10</td></tr>` : ''}
+              <tr><td>Notas</td><td>${t.notas}</td></tr>
+            </table>
+          </div>
+        </div>`;
+    }
+  }
+  if (!html) html = '<div class="empty-msg">Sin pendientes en esta categoría.</div>';
+  document.getElementById('panel').innerHTML = html;
+  updateStats();
+}
+
+function updateStats() {
+  const c = { critica:0, alta:0, media:0, baja:0 }; let total = 0;
+  TAREAS.forEach(t => { if (done.has(t.id)) return; c[t.p]++; total++; });
+  document.getElementById('sc').textContent = c.critica;
+  document.getElementById('sa').textContent = c.alta;
+  document.getElementById('sm').textContent = c.media;
+  document.getElementById('sb').textContent = c.baja;
+  document.getElementById('st').textContent = total;
+  document.getElementById('sh').textContent = done.size;
+}
+
+function buildFilters() {
+  const cats = ['todos', ...new Set(TAREAS.map(t => t.cat))];
+  document.getElementById('filtros').innerHTML = cats.map(c =>
+    `<button class="filter-btn${c===filtro?' active':''}" onclick="setFiltro('${c}',this)">${c==='todos'?'Todos':c}</button>`
+  ).join('');
+}
+
+function setFiltro(f, btn) {
+  filtro = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function toggleDone(e, id) {
+  e.stopPropagation();
+  done.has(id) ? done.delete(id) : done.add(id);
+  saveDone();
+  render();
+}
+
+function toggleCtx(id) {
+  const ctx = document.getElementById('ctx'+id);
+  const btn = document.getElementById('btn'+id);
+  if (!ctx) return;
+  const open = ctx.style.display === 'block';
+  ctx.style.display = open ? 'none' : 'block';
+  if (btn) btn.textContent = open ? '▶' : '▼';
+}
+
+function buildBanners() {
+  const now = new Date();
+  const diasG = Math.ceil((new Date('2026-05-01') - now) / 86400000);
+  if (diasG >= 0 && diasG <= 14) {
+    document.getElementById('banner-google').style.display = '';
+    document.getElementById('google-txt').textContent =
+      `$588,734 USD · Faltan ${diasG} día${diasG!==1?'s':''} · Submit objetivo: 30 abr antes 12pm CDMX`;
+  }
+  if (META.cte_proximos?.length) {
+    const prox = META.cte_proximos
+      .filter(c => dr(c.fecha) !== null && dr(c.fecha) >= 0)
+      .sort((a,b) => new Date(a.fecha) - new Date(b.fecha))[0];
+    if (prox) {
+      const dPrep = dr(prox.prep_limite);
+      document.getElementById('banner-cte').style.display = '';
+      document.getElementById('banner-cte').innerHTML =
+        `📅 <strong>Próximo CTE SEP (Sesión ${prox.sesion}):</strong> ${fmt(prox.fecha)} — preparativos Tlakakini listos antes del <strong>${fmt(prox.prep_limite)}</strong>`+
+        (dPrep <= 7 ? ` <span style="color:#b83228;font-weight:600">⚑ ${dPrep}d</span>` : '');
+    }
+  }
+}
+
+function init() {
+  if (typeof window.PENDIENTES === 'undefined') {
+    document.getElementById('panel').innerHTML = `
+      <div class="err">
+        No se encontró <code>pendientes.js</code>.<br>
+        Asegúrate de que <code>pendientes.js</code> está en la misma carpeta que <code>panel.html</code>.
+      </div>`;
+    return;
+  }
+  TAREAS = window.PENDIENTES.tareas || [];
+  META   = window.PENDIENTES.meta  || {};
+  const now = new Date();
+  document.getElementById('meta-txt').innerHTML =
+    now.toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+
+    (META.updated ? `<br><span>datos: ${META.updated}</span>` : '');
+  buildBanners();
+  buildFilters();
+  render();
+}
+
+init();
+</script>
+</body>
+</html>
