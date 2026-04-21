@@ -667,14 +667,44 @@
       "notas": "n total estimado: 50–60 docentes en dos contextos institucionales. Comparación UTJ vs. CU Tlaquepaque. Envío a revista Q2 en enero-febrero 2027. Publicación estimada: finales 2027. Marco: adopción de IA generativa en formación docente (no centrado en herramienta específica)."
     },
     {
-      "id": 85,
-      "titulo": "Redactar resumen Innovaforum 2026 — IA para formación docente (Fase 1)",
+      "id": 86,
+      "titulo": "Armar propuesta formal del curso IA-Docentes para apertura en CU Tlaquepaque",
       "cat": "IA-Docentes",
       "p": "alta",
-      "fl": "2026-06-08",
+      "fl": "2026-05-15",
       "te": "3 h",
       "snii": 8,
-      "notas": "Basado en resultados preliminares de Fase 1 (CU Tlaquepaque). Eje: tecnología educativa / IA. Sustituye o complementa resumen #2 de Innovaforum. Máx. 1000 palabras. Límite: 8 junio 2026."
+      "notas": "Documento formal para gestionar apertura oficial del curso intersemestral. Incluir: justificacion, objetivo, contenido tematico, numero de participantes (~20 profesores), fechas propuestas (junio 2026), vinculacion con investigacion. Requisito previo para que division o rectoria autorice el curso."
+    },
+    {
+      "id": 87,
+      "titulo": "Reclutar 20 profesores inscritos para curso IA-Docentes CU Tlaquepaque",
+      "cat": "IA-Docentes",
+      "p": "alta",
+      "fl": "2026-05-31",
+      "te": "4 h",
+      "snii": 8,
+      "notas": "Minimo 20 participantes para que la institucion abra el curso. Estrategia: correo institucional + contacto directo en academia. Vincular con apertura formal (#86). Cupo objetivo: 20-25 profesores."
+    },
+    {
+      "id": 88,
+      "titulo": "Crear pagina web de pronostico atmosferico — CU Tlaquepaque",
+      "cat": "Investigacion",
+      "p": "critica",
+      "fl": "2026-04-25",
+      "te": "6 h",
+      "snii": 9,
+      "notas": "El rector de CU Tlaquepaque pidio presentacion de la pagina esta semana (dia sin definir — confirmar). Producto: pagina web funcional con visualizacion de pronostico para la zona. Relacionado con linea de fisica atmosferica y proyecto Google.org. Tener version demo antes de la presentacion."
+    },
+    {
+      "id": 89,
+      "titulo": "Preparar presentacion de pagina web de pronostico para el rector de CU Tlaquepaque",
+      "cat": "CU Tlaquepaque",
+      "p": "critica",
+      "fl": "2026-04-25",
+      "te": "2 h",
+      "snii": 7,
+      "notas": "Esta semana, dia sin definir — confirmar fecha con el rector. Presentar: funcionalidad de la pagina, datos utilizados, alcance y aplicaciones. Depende de #88 (demo lista)."
     }
   ]
 }
